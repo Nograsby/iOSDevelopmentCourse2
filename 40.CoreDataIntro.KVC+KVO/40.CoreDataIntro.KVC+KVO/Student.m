@@ -10,4 +10,8 @@
 
 @implementation Student
 
+- (NSString *)description {
+    return [NSString stringWithFormat:@"\nfirstName - %@,\nlastName - %@,\ndateOfBirth - %@,\ngenderType - %d,\ngrade - %f,", _firstName, _lastName, _dateOfBirth, _genderType, _grade];
+}
+
 @end

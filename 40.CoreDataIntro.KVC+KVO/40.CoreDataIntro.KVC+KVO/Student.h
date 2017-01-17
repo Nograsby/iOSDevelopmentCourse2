@@ -17,8 +17,8 @@ typedef NS_ENUM(NSInteger, VAGenderType) {
 
 @property (strong, nonatomic) NSString *firstName;
 @property (strong, nonatomic) NSString *lastName;
-@property (strong, nonatomic) NSDate *dateOfBirth;
-@property (assign, nonatomic) VAGenderType *genderType;
-@property (assign, nonatomic) NSInteger grade;
+@property (strong, nonatomic) NSString *dateOfBirth;
+@property (assign, nonatomic) VAGenderType genderType;
+@property (assign, nonatomic) float grade;
 
 @end

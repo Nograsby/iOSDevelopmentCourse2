@@ -7,11 +7,16 @@
 //
 
 #import "VATableViewController.h"
+#import "Student.h"
 
-@interface VATableViewController ()
+@interface VATableViewController () <UITextFieldDelegate, UIPickerViewDelegate>
+
+@property (strong, nonatomic) Student *student;
 
 @property (weak, nonatomic) IBOutlet UITextField *firstNameField;
 @property (weak, nonatomic) IBOutlet UITextField *lastNameField;
+@property (weak, nonatomic) IBOutlet UIDatePicker *datePicker;
+@property (weak, nonatomic) IBOutlet UISegmentedControl *segmentedControl;
 @property (weak, nonatomic) IBOutlet UITextField *gradeField;
 
 @end
@@ -21,72 +26,67 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    // Uncomment the following line to preserve selection between presentations.
-    // self.clearsSelectionOnViewWillAppear = NO;
+    Student *student = [[Student alloc] init];
+    student.firstName = @"Boris";
+    student.lastName = @"Ivanov";
+    student.dateOfBirth = @"2000-01-10";
+    student.genderType = VAGenderTypeMale;
+    student.grade = 4.0;
     
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
-}
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-
-
-/*
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:<#@"reuseIdentifier"#> forIndexPath:indexPath];
+    self.student = student;
     
-    // Configure the cell...
+    self.firstNameField.text = student.firstName;
+    self.lastNameField.text = student.lastName;
+    self.segmentedControl.selectedSegmentIndex = student.genderType;
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    [formatter setDateFormat:@"yyyy-MM-dd"];
+    self.datePicker.date = [formatter dateFromString:student.dateOfBirth];
+    self.gradeField.text = [NSString stringWithFormat:@"%f", student.grade];
+}
+
+#pragma mark - UITextFieldDelegate
+
+- (void)textFieldDidEndEditing:(UITextField *)textField {
+    switch (textField.tag) {
+        case 0:
+            self.student.firstName = textField.text;
+            break;
+        case 1:
+            self.student.lastName = textField.text;
+            break;
+        case 2:
+            self.student.grade = textField.text.floatValue;
+            break;
+        default:
+            break;
+    }
+    NSLog(@"%@", self.student);
     
-    return cell;
 }
-*/
 
-/*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
+- (BOOL)textFieldShouldReturn:(UITextField *)textField {
+    if ((textField.tag == 0) || (textField.tag == 1)) {
+        UITextField *nextTextField = (UITextField *)[self.view viewWithTag:(textField.tag + 1)];
+        [nextTextField becomeFirstResponder];
+        return YES;
+    }
+    else {
+        [textField resignFirstResponder];
+        return YES;
+    }
 }
-*/
 
-/*
-// Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    } else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-    }   
+- (IBAction)dateChanged:(UIDatePicker *)sender {
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    [formatter setDateFormat:@"yyyy-MM-dd"];
+    self.student.dateOfBirth = [formatter stringFromDate:self.datePicker.date];
+    NSLog(@"%@", self.student);
 }
-*/
 
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
+- (IBAction)genderTypeChanged:(UISegmentedControl *)sender {
+    self.student.genderType = sender.selectedSegmentIndex;
+    NSLog(@"%@", self.student);
+
 }
-*/
-
-/*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
-}
-*/
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end
