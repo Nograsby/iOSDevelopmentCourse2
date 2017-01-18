@@ -35,6 +35,7 @@
 //
 
 #import "AppDelegate.h"
+#import "Student.h"
 
 @interface AppDelegate ()
 
@@ -44,8 +45,44 @@
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    // Override point for customization after application launch.
     
+    Student *student1 = [[Student alloc] init];
+    student1.firstName = @"Boris";
+    student1.lastName = @"Ivanov";
+    student1.dateOfBirth = @"2000-01-10";
+    student1.genderType = VAGenderTypeMale;
+    student1.grade = 4.0;
+    
+    Student *student2 = [[Student alloc] init];
+    student2.firstName = @"Igor";
+    student2.lastName = @"Bobrov";
+    student2.dateOfBirth = @"1985-01-12";
+    student2.genderType = VAGenderTypeMale;
+    student2.grade = 3.5;
+    
+    Student *student3 = [[Student alloc] init];
+    student3.firstName = @"Masha";
+    student3.lastName = @"Petrova";
+    student3.dateOfBirth = @"1987-05-07";
+    student3.genderType = VAGenderTypeFemale;
+    student3.grade = 4.5;
+    
+    Student *student4 = [[Student alloc] init];
+    student4.firstName = @"Petr";
+    student4.lastName = @"Fedorov";
+    student4.dateOfBirth = @"1968-04-04";
+    student4.genderType = VAGenderTypeMale;
+    student4.grade = 3.0;
+    
+    student1.friend = student2;
+    student2.friend = student3;
+    student3.friend = student4;
+    student4.friend = student1;
+
+    NSMutableArray *studentsArray = [NSMutableArray arrayWithObjects:student1, student2, student3, student4, nil];
+    for (Student *student in studentsArray) {
+        [student.friend setValue:@2.1 forKeyPath:@"grade"];
+    }
     
     return YES;
 }

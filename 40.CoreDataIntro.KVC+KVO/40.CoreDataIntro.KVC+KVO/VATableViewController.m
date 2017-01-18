@@ -35,13 +35,54 @@
     
     self.student = student;
     
-    self.firstNameField.text = student.firstName;
-    self.lastNameField.text = student.lastName;
-    self.segmentedControl.selectedSegmentIndex = student.genderType;
+    [self addObserver:self
+           forKeyPath:@"student.firstName"
+              options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld
+              context:nil];
+    
+    [self addObserver:self
+           forKeyPath:@"student.lastName"
+              options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld
+              context:nil];
+    
+    [self addObserver:self
+           forKeyPath:@"student.dateOfBirth"
+              options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld
+              context:nil];
+    
+    [self addObserver:self
+           forKeyPath:@"student.genderType"
+              options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld
+              context:nil];
+    
+    [self addObserver:self
+           forKeyPath:@"student.grade"
+              options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld
+              context:nil];
+    
+    [self reloadData];
+    
+    [NSTimer scheduledTimerWithTimeInterval:5.f repeats:NO block:^(NSTimer * _Nonnull timer) {
+        [student resetProperties];
+    }];
+}
+
+- (void)dealloc {
+    [self removeObserver:self forKeyPath:@"student.firstName"];
+    [self removeObserver:self forKeyPath:@"student.lastName"];
+    [self removeObserver:self forKeyPath:@"student.dateOfBirth"];
+    [self removeObserver:self forKeyPath:@"student.genderType"];
+    [self removeObserver:self forKeyPath:@"student.grade"];
+}
+
+- (void)reloadData {
+    self.firstNameField.text = self.student.firstName;
+    self.lastNameField.text = self.student.lastName;
+    self.segmentedControl.selectedSegmentIndex = self.student.genderType;
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
     [formatter setDateFormat:@"yyyy-MM-dd"];
-    self.datePicker.date = [formatter dateFromString:student.dateOfBirth];
-    self.gradeField.text = [NSString stringWithFormat:@"%f", student.grade];
+    self.datePicker.date = [formatter dateFromString:self.student.dateOfBirth];
+    self.gradeField.text = [NSString stringWithFormat:@"%f", self.student.grade];
 }
 
 #pragma mark - UITextFieldDelegate
@@ -60,8 +101,6 @@
         default:
             break;
     }
-    NSLog(@"%@", self.student);
-    
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
@@ -76,17 +115,23 @@
     }
 }
 
+#pragma mark - Actions
+
 - (IBAction)dateChanged:(UIDatePicker *)sender {
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
     [formatter setDateFormat:@"yyyy-MM-dd"];
     self.student.dateOfBirth = [formatter stringFromDate:self.datePicker.date];
-    NSLog(@"%@", self.student);
 }
 
 - (IBAction)genderTypeChanged:(UISegmentedControl *)sender {
     self.student.genderType = sender.selectedSegmentIndex;
-    NSLog(@"%@", self.student);
+}
 
+#pragma mark - Observer
+
+- (void)observeValueForKeyPath:(nullable NSString *)keyPath ofObject:(nullable id)object change:(nullable NSDictionary<NSKeyValueChangeKey, id> *)change context:(nullable void *)context {
+    NSLog(@"\nProperty - %@. \nChanged from - %@ to - %@", keyPath, change[@"old"], change[@"new"]);
+    [self reloadData];
 }
 
 @end
