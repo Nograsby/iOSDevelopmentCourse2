@@ -39,6 +39,8 @@
 
 @interface AppDelegate ()
 
+@property (strong, nonatomic) Student *student;
+
 @end
 
 @implementation AppDelegate
@@ -46,6 +48,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     
+    // Master
     Student *student1 = [[Student alloc] init];
     student1.firstName = @"Boris";
     student1.lastName = @"Ivanov";
@@ -53,24 +56,29 @@
     student1.genderType = VAGenderTypeMale;
     student1.grade = 4.0;
     
+    [student1 addObserver:self
+               forKeyPath:@"grade"
+                  options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld
+                  context:nil];
+    
     Student *student2 = [[Student alloc] init];
     student2.firstName = @"Igor";
     student2.lastName = @"Bobrov";
-    student2.dateOfBirth = @"1985-01-12";
+    student2.dateOfBirth = @"1987-01-12";
     student2.genderType = VAGenderTypeMale;
     student2.grade = 3.5;
     
     Student *student3 = [[Student alloc] init];
     student3.firstName = @"Masha";
     student3.lastName = @"Petrova";
-    student3.dateOfBirth = @"1987-05-07";
+    student3.dateOfBirth = @"1987-04-07";
     student3.genderType = VAGenderTypeFemale;
     student3.grade = 4.5;
     
     Student *student4 = [[Student alloc] init];
     student4.firstName = @"Petr";
     student4.lastName = @"Fedorov";
-    student4.dateOfBirth = @"1968-04-04";
+    student4.dateOfBirth = @"1998-04-04";
     student4.genderType = VAGenderTypeMale;
     student4.grade = 3.0;
     
@@ -80,39 +88,58 @@
     student4.friend = student1;
 
     NSMutableArray *studentsArray = [NSMutableArray arrayWithObjects:student1, student2, student3, student4, nil];
-    for (Student *student in studentsArray) {
-        [student.friend setValue:@2.1 forKeyPath:@"grade"];
-    }
+//    for (Student *student in studentsArray) {
+//        [student.friend setValue:@2.1 forKeyPath:@"grade"];
+//    }
+    
+    self.student = student1;
+    
+    // Supermen
+    NSMutableArray *studentsNamesArray = [studentsArray mutableArrayValueForKey:@"firstName"];
+    NSLog(@"array - %@", studentsNamesArray);
+    
+    NSString *yongestStudent = [studentsArray valueForKeyPath:@"@max.dateOfBirth"];
+    NSString *oldestStudent = [studentsArray valueForKeyPath:@"@min.dateOfBirth"];
+    
+    NSLog(@"\nyongestStudent dateOfBirth - %@, oldestStudent dateOfBirth - %@", yongestStudent, oldestStudent);
+    
+    NSNumber *gradeSum = [studentsArray valueForKeyPath:@"@sum.grade"];
+    NSLog(@"Summary grade %f", gradeSum.floatValue);
+    
+    NSNumber *gradeAvg = [studentsArray valueForKeyPath:@"@avg.grade"];
+    NSLog(@"Average grade %f", gradeAvg.floatValue);
     
     return YES;
 }
 
+- (void)dealloc {
+    [self removeObserver:self forKeyPath:@"grade"];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
+    NSLog(@"\nProperty - %@. \nChanged from - %@ to - %@", keyPath, change[@"old"], change[@"new"]);
+}
 
 - (void)applicationWillResignActive:(UIApplication *)application {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
     // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
 }
 
-
 - (void)applicationDidEnterBackground:(UIApplication *)application {
     // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
     // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
 }
 
-
 - (void)applicationWillEnterForeground:(UIApplication *)application {
     // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
 }
-
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
 }
 
-
 - (void)applicationWillTerminate:(UIApplication *)application {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
-
 
 @end
